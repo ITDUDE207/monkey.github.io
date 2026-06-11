@@ -6,66 +6,31 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #000; overflow: hidden; width: 100vw; height: 100vh; }
     
-    .video-container {
+    video {
       position: fixed;
       top: 0; left: 0;
       width: 100vw;
       height: 100vh;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
       object-fit: cover;
-      -webkit-touch-callout: none; 
-    }
-
-    /* Clear shield blocking Safari download popups */
-    .guard-overlay {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 10;
-      background: rgba(0,0,0,0);
+      
+      /* CRITICAL: Disables clicks, taps, and Safari long-press menus directly */
+      pointer-events: none; 
       -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
     }
   </style>
 </head>
 <body>
 
-  <div class="video-container">
-    <div class="guard-overlay" oncontextmenu="return false;"></div>
-
-    <!-- Added 'muted' explicitly as an attribute and property fallback -->
-    <video id="myVideo" autoplay loop muted playsinline disablePictureInPicture controlsList="nodownload">
-      <source src="monkey.mp4" type="video/mp4" />
-    </video>
-  </div>
+  <!-- No overlays needed. The attributes handle autoplay, the CSS handles anti-download -->
+  <video autoplay loop muted playsinline disablePictureInPicture controlsList="nodownload">
+    <source src="monkey.mp4" type="video/mp4" />
+  </video>
 
   <script>
-    const video = document.getElementById('myVideo');
-
-    // Force initialization fixes for Safari background loading restrictions
-    video.muted = true;
-    
-    // Explicitly command playback to bypass overlay event blocking
-    const playPromise = video.play();
-    if (playPromise !== undefined) {
-      playPromise.catch(() => {
-        // Fallback: If browser strictly requires an initial interaction anyway,
-        // it triggers autoplay on the very first touch anywhere on the page.
-        document.addEventListener('click', () => {
-          video.play();
-        }, { once: true });
-      });
-    }
-
-    // Stop all right-clicks
-    document.addEventListener('contextmenu', (e) => {
-      e.preventDefault();
-      return false;
-    }, { capture: true });
+    // Global safety catch to completely prevent context menus anywhere on the page
+    document.addEventListener('contextmenu', e => e.preventDefault(), { capture: true });
   </script>
 </body>
 </html>
