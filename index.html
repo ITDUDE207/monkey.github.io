@@ -11,12 +11,43 @@
       width: 100vw;
       height: 100vh;
       object-fit: cover;
+      /* Prevents right-click menus on mobile and some desktop browsers */
+      pointer-events: none; 
+    }
+    /* Invisible overlay to block right-clicks and long-presses */
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 10;
+      background: transparent;
     }
   </style>
 </head>
 <body>
-  <video autoplay loop muted playsinline>
+
+  <!-- The overlay blocks direct interaction with the video element -->
+  <div class="overlay" oncontextmenu="return false;"></div>
+
+  <!-- nodownload and nohtml5playbackrate disable standard browser controls -->
+  <video autoplay loop muted playsinline controlsList="nodownload nohtml5playbackrate" disablePictureInPicture>
     <source src="monkey.mp4" type="video/mp4" />
   </video>
+
+  <script>
+    // Disables the right-click context menu entirely on the page
+    document.addEventListener('contextmenu', event => event.preventDefault());
+
+    // Disables common keyboard shortcuts used to open developer tools
+    document.addEventListener('keydown', event => {
+      if (event.key === 'F12' || 
+          (event.ctrlKey && event.shiftKey && ['I', 'C', 'J'].includes(event.key.toUpperCase())) || 
+          (event.ctrlKey && event.key.toUpperCase() === 'U')) {
+        event.preventDefault();
+      }
+    });
+  </script>
 </body>
 </html>
+
